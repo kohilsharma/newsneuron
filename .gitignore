@@ -1,0 +1,182 @@
+# Operating System Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# IDE and Editor Files
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.sublime-*
+
+# Environment Variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+.conda/
+.pip-cache/
+*.egg-info/
+dist/
+build/
+
+# Frontend Build Outputs
+frontend/dist/
+frontend/build/
+frontend/.nuxt/
+frontend/.next/
+frontend/coverage/
+frontend/.nyc_output/
+
+# Backend Build Outputs
+backend/build/
+backend/dist/
+backend/.pytest_cache/
+backend/htmlcov/
+backend/.coverage
+backend/.tox/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Runtime Data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage Directory
+coverage/
+*.lcov
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# Redis Dump
+dump.rdb
+
+# Compiled Binary Addons
+build/Release/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Yarn Integrity file
+.yarn-integrity
+
+# Parcel-bundler cache
+.cache
+.parcel-cache
+
+# Cypress
+cypress/screenshots/
+cypress/videos/
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Tailwind CSS
+.tailwindcss-cache
+
+# Local environment configuration
+.local
+
+# Vercel
+.vercel
+
+# Railway
+.railway
+
+# Sentry
+.sentryclirc
+
+# AI/ML Models and Data
+*.model
+*.pkl
+*.joblib
+data/raw/
+data/processed/
+models/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# pytest
+.pytest_cache/
+.cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Backup files
+*.bak
+*.backup
+
+# Archive files
+*.tar.gz
+*.zip
+*.rar
+
+# Local configuration
+config/local.py
+config/local.js
+
+# Certificate files
+*.pem
+*.key
+*.crt
+
+# API Keys and Secrets (extra safety)
+**/secrets/
+**/*secret*
+**/*key*
+**/*token*
