@@ -55,7 +55,7 @@ backend/
 |-----------|------------|---------|---------|
 | **Web Framework** | FastAPI | 0.116+ | High-performance async API |
 | **AI Orchestration** | LangGraph | 0.6+ | Multi-agent workflow management |
-| **Language Models** | LangChain + OpenAI | Latest | RAG and conversation chains |
+| **Language Models** | LangChain + OpenRouter | Latest | RAG and conversation chains |
 | **Vector Database** | Supabase + pgvector | Latest | Semantic search and embeddings |
 | **Graph Database** | Neo4j | 5.28+ | Entity relationships and graph queries |
 | **NLP Processing** | spaCy | 3.7+ | Named entity recognition and text processing |
@@ -93,7 +93,7 @@ backend/
 
 4. **Download spaCy model**:
    ```bash
-   python -m spacy download en_core_web_sm
+   python -m spacy download en_core_web_md
    ```
 
 5. **Set up environment variables**:
@@ -111,12 +111,10 @@ backend/
    NEO4J_PASSWORD=your_password
    
    # AI Services
-   OPENAI_API_KEY=your_openai_api_key
    OPENROUTER_API_KEY=your_openrouter_api_key
    
    # Application Settings
    DEBUG=True
-   SECRET_KEY=your_secret_key_here
    ```
 
 6. **Start the development server**:
@@ -155,7 +153,7 @@ The API will be available at:
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | `POST` | `/api/v1/chat/` | Send message to AI assistant |
-| `GET` | `/api/v1/chat/conversations` | List user conversations |
+| `GET` | `/api/v1/chat/conversations` | List conversations |
 | `GET` | `/api/v1/chat/conversations/{id}/history` | Get conversation history |
 | `DELETE` | `/api/v1/chat/conversations/{id}` | Delete conversation |
 
@@ -214,21 +212,19 @@ def create_search_workflow():
 
 ### Vector Search
 
-Semantic search using **OpenAI embeddings** and **pgvector**:
+Semantic search using **free local embeddings** and **pgvector**:
 
 ```python
 async def semantic_search(query: str, limit: int = 10):
-    # Generate query embedding
-    embedding = await openai_client.embeddings.create(
-        model="text-embedding-ada-002",
-        input=query
-    )
+    # Generate query embedding using sentence-transformers
+    embedding_service = get_embedding_service()
+    embedding = await embedding_service.generate_embedding(query)
     
     # Search in Supabase
     results = await supabase.rpc(
         'semantic_search',
         {
-            'query_embedding': embedding.data[0].embedding,
+            'query_embedding': f"[{','.join(map(str, embedding))}]",
             'similarity_threshold': 0.7,
             'match_count': limit
         }
@@ -262,7 +258,7 @@ async def get_entity_relationships(entity_name: str):
 Used for:
 - **Article storage**: Full-text content and metadata
 - **Vector embeddings**: Semantic search capabilities
-- **User data**: Conversations and preferences
+- **Conversations and preferences**
 
 ```python
 # Example: Article insertion with embedding
@@ -395,7 +391,7 @@ async def process_articles(articles: List[Dict]):
 ```python
 import spacy
 
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_md")
 
 def extract_entities(text: str) -> List[Dict]:
     doc = nlp(text)
@@ -425,10 +421,8 @@ def extract_entities(text: str) -> List[Dict]:
 | `NEO4J_URI` | Neo4j connection URI | Yes | `bolt://localhost:7687` |
 | `NEO4J_USERNAME` | Neo4j username | Yes | `neo4j` |
 | `NEO4J_PASSWORD` | Neo4j password | Yes | - |
-| `OPENAI_API_KEY` | OpenAI API key | Yes | - |
-| `OPENROUTER_API_KEY` | OpenRouter API key | No | - |
+| `OPENROUTER_API_KEY` | OpenRouter API key | Yes | - |
 | `DEBUG` | Enable debug mode | No | `False` |
-| `SECRET_KEY` | JWT secret key | Yes | - |
 | `CORS_ORIGINS` | Allowed CORS origins | No | `["*"]` |
 
 ### Settings Management
@@ -454,7 +448,6 @@ class Settings(BaseSettings):
     openrouter_api_key: str = ""
     
     # Security
-    secret_key: str
     cors_origins: List[str] = ["*"]
     
     class Config:
@@ -483,7 +476,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Download spaCy model
-RUN python -m spacy download en_core_web_sm
+RUN python -m spacy download en_core_web_md
 
 # Copy application
 COPY app/ ./app/
@@ -554,7 +547,7 @@ async def health_check():
 
 2. **spaCy Model Missing**:
    ```bash
-   python -m spacy download en_core_web_sm
+   python -m spacy download en_core_web_md
    ```
 
 3. **Import Errors**:
@@ -569,7 +562,7 @@ async def health_check():
 4. **API Key Issues**:
    ```bash
    # Verify API keys are set
-   python -c "import os; print('OpenAI:', bool(os.getenv('OPENAI_API_KEY')))"
+   python -c "import os; print('OpenRouter:', bool(os.getenv('OPENROUTER_API_KEY')))"
    ```
 
 ## 📚 API Documentation

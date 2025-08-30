@@ -174,10 +174,9 @@ Before your PR can be merged, ensure:
 
 ### 4. Code Review Process
 
-1. **Automated checks** will run (CI/CD pipeline)
-2. **Maintainer review** - we'll review your code and provide feedback
-3. **Address feedback** - make requested changes
-4. **Final approval** - once approved, your PR will be merged
+1. **Maintainer review** - we'll review your code and provide feedback
+2. **Address feedback** - make requested changes
+3. **Final approval** - once approved, your PR will be merged
 
 ## Coding Standards
 

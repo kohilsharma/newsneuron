@@ -18,12 +18,6 @@ api.interceptors.request.use(
       config.url = `/api/${version}${config.url}`;
     }
 
-    // Add auth token if available (when auth is implemented)
-    const token = localStorage.getItem("authToken");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-
     return config;
   },
   (error) => {

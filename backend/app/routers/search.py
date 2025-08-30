@@ -7,7 +7,7 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.schemas import SearchRequest, SearchResponse, ArticleResult
-from app.dependencies import get_hybrid_retriever, get_current_user
+from app.dependencies import get_hybrid_retriever
 from app.services.hybrid_retriever import HybridRetriever
 
 router = APIRouter()
@@ -17,7 +17,6 @@ router = APIRouter()
 async def search_articles(
     request: SearchRequest,
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Search articles using hybrid vector-graph approach
@@ -77,7 +76,6 @@ async def search_articles_get(
     limit: int = Query(10, description="Maximum results", ge=1, le=50),
     include_entities: bool = Query(True, description="Include entity information"),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     GET endpoint for article search (alternative to POST)
@@ -89,14 +87,13 @@ async def search_articles_get(
         include_entities=include_entities
     )
     
-    return await search_articles(request, retriever, current_user)
+    return await search_articles(request, retriever)
 
 
 @router.get("/suggestions")
 async def get_search_suggestions(
     query: str = Query(..., description="Partial query for suggestions", min_length=1),
     limit: int = Query(5, description="Maximum suggestions", ge=1, le=10),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get search suggestions based on partial query
@@ -133,7 +130,6 @@ async def search_entities(
     entity_type: str = Query(None, description="Filter by entity type: PERSON, ORGANIZATION, LOCATION, EVENT"),
     limit: int = Query(20, description="Maximum entities", ge=1, le=50),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Search for entities in the knowledge graph
@@ -175,7 +171,6 @@ async def find_similar_articles(
     limit: int = Query(10, description="Maximum similar articles", ge=1, le=20),
     similarity_threshold: float = Query(0.7, description="Minimum similarity score", ge=0.0, le=1.0),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Find articles similar to a specific article

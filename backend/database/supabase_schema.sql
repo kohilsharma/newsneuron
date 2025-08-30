@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS articles (
     url TEXT UNIQUE,
     published_date TIMESTAMP WITH TIME ZONE,
     source VARCHAR(100),
-    embedding VECTOR(1536), -- OpenAI embedding dimension
+    embedding VECTOR(384), -- sentence-transformers/all-MiniLM-L6-v2 dimension
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -38,10 +38,20 @@ CREATE TABLE IF NOT EXISTS article_entities (
     PRIMARY KEY (article_id, entity_id)
 );
 
+-- Chunks table - stores article chunks with embeddings for improved retrieval
+CREATE TABLE IF NOT EXISTS chunks (
+    id SERIAL PRIMARY KEY,
+    article_id INTEGER REFERENCES articles(id) ON DELETE CASCADE,
+    chunk_index INTEGER NOT NULL,
+    content TEXT NOT NULL,
+    embedding VECTOR(384),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Conversations table - stores chat conversations
 CREATE TABLE IF NOT EXISTS conversations (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id TEXT, -- Can be extended to proper user system later
     title TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -66,7 +76,6 @@ CREATE TABLE IF NOT EXISTS flashcards (
     entities JSONB, -- Array of entity objects
     source_articles JSONB, -- Array of source article references
     category VARCHAR(100),
-    user_id TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -84,19 +93,49 @@ CREATE INDEX IF NOT EXISTS idx_entities_name_trgm ON entities USING gin(name gin
 CREATE INDEX IF NOT EXISTS idx_article_entities_article_id ON article_entities(article_id);
 CREATE INDEX IF NOT EXISTS idx_article_entities_entity_id ON article_entities(entity_id);
 
-CREATE INDEX IF NOT EXISTS idx_conversations_user_id ON conversations(user_id);
+CREATE INDEX IF NOT EXISTS idx_chunks_article_id ON chunks(article_id);
+CREATE INDEX IF NOT EXISTS idx_chunks_chunk_index ON chunks(chunk_index);
+
 CREATE INDEX IF NOT EXISTS idx_conversations_created_at ON conversations(created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created_at ON messages(created_at DESC);
 
-CREATE INDEX IF NOT EXISTS idx_flashcards_user_id ON flashcards(user_id);
 CREATE INDEX IF NOT EXISTS idx_flashcards_category ON flashcards(category);
 CREATE INDEX IF NOT EXISTS idx_flashcards_created_at ON flashcards(created_at DESC);
 
+-- Vector similarity search function for chunks
+CREATE OR REPLACE FUNCTION match_chunks(
+    query_embedding vector(384),
+    match_threshold float DEFAULT 0.78,
+    match_count int DEFAULT 20
+)
+RETURNS TABLE (
+    id int,
+    article_id int,
+    chunk_index int,
+    content text,
+    similarity float
+)
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT
+        chunks.id,
+        chunks.article_id,
+        chunks.chunk_index,
+        chunks.content,
+        1 - (chunks.embedding <=> query_embedding) AS similarity
+    FROM chunks
+    WHERE chunks.embedding IS NOT NULL
+      AND 1 - (chunks.embedding <=> query_embedding) > match_threshold
+    ORDER BY chunks.embedding <=> query_embedding
+    LIMIT match_count;
+$$;
+
 -- Vector similarity search function
 CREATE OR REPLACE FUNCTION match_articles(
-    query_embedding vector(1536),
+    query_embedding vector(384),
     match_threshold float DEFAULT 0.78,
     match_count int DEFAULT 10
 )
@@ -170,6 +209,8 @@ FROM articles
 WHERE published_date >= NOW() - INTERVAL '30 days'
 ORDER BY published_date DESC;
 
+ALTER VIEW recent_articles SET (security_invoker = on);
+
 CREATE OR REPLACE VIEW entity_mention_counts AS
 SELECT 
     e.id,
@@ -183,54 +224,79 @@ LEFT JOIN articles a ON ae.article_id = a.id
 GROUP BY e.id, e.name, e.type
 ORDER BY mention_count DESC;
 
+ALTER VIEW entity_mention_counts SET (security_invoker = on);
+
 -- Row Level Security (RLS) policies
 -- Enable RLS on user-specific tables
 ALTER TABLE conversations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE flashcards ENABLE ROW LEVEL SECURITY;
+ALTER TABLE articles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE entities ENABLE ROW LEVEL SECURITY;
+ALTER TABLE article_entities ENABLE ROW LEVEL SECURITY;
+
+-- Policies for articles
+CREATE POLICY "Enable read access for all users" ON articles
+    FOR SELECT USING (TRUE);
+CREATE POLICY "Enable write access for all users" ON articles
+    FOR INSERT WITH CHECK (TRUE);
+CREATE POLICY "Enable update access for all users" ON articles
+    FOR UPDATE USING (TRUE);
+CREATE POLICY "Enable delete access for all users" ON articles
+    FOR DELETE USING (TRUE);
+
+-- Policies for entities
+CREATE POLICY "Enable read access for all users" ON entities
+    FOR SELECT USING (TRUE);
+CREATE POLICY "Enable write access for all users" ON entities
+    FOR INSERT WITH CHECK (TRUE);
+CREATE POLICY "Enable update access for all users" ON entities
+    FOR UPDATE USING (TRUE);
+CREATE POLICY "Enable delete access for all users" ON entities
+    FOR DELETE USING (TRUE);
+
+-- Policies for article_entities
+CREATE POLICY "Enable read access for all users" ON article_entities
+    FOR SELECT USING (TRUE);
+CREATE POLICY "Enable write access for all users" ON article_entities
+    FOR INSERT WITH CHECK (TRUE);
+CREATE POLICY "Enable update access for all users" ON article_entities
+    FOR UPDATE USING (TRUE);
+CREATE POLICY "Enable delete access for all users" ON article_entities
+    FOR DELETE USING (TRUE);
 
 -- Policies for conversations (basic - can be enhanced with proper auth)
-CREATE POLICY "Users can view their own conversations" ON conversations
-    FOR SELECT USING (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable read access for all users" ON conversations
+    FOR SELECT USING (TRUE);
 
-CREATE POLICY "Users can insert their own conversations" ON conversations
-    FOR INSERT WITH CHECK (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable insert access for all users" ON conversations
+    FOR INSERT WITH CHECK (TRUE);
 
-CREATE POLICY "Users can update their own conversations" ON conversations
-    FOR UPDATE USING (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable update access for all users" ON conversations
+    FOR UPDATE USING (TRUE);
 
-CREATE POLICY "Users can delete their own conversations" ON conversations
-    FOR DELETE USING (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable delete access for all users" ON conversations
+    FOR DELETE USING (TRUE);
 
 -- Policies for messages
-CREATE POLICY "Users can view messages from their conversations" ON messages
-    FOR SELECT USING (
-        conversation_id IN (
-            SELECT id FROM conversations 
-            WHERE auth.uid()::text = user_id OR user_id IS NULL
-        )
-    );
+CREATE POLICY "Enable read access for all users" ON messages
+    FOR SELECT USING (TRUE);
 
-CREATE POLICY "Users can insert messages to their conversations" ON messages
-    FOR INSERT WITH CHECK (
-        conversation_id IN (
-            SELECT id FROM conversations 
-            WHERE auth.uid()::text = user_id OR user_id IS NULL
-        )
-    );
+CREATE POLICY "Enable insert access for all users" ON messages
+    FOR INSERT WITH CHECK (TRUE);
 
 -- Policies for flashcards
-CREATE POLICY "Users can view their own flashcards" ON flashcards
-    FOR SELECT USING (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable read access for all users" ON flashcards
+    FOR SELECT USING (TRUE);
 
-CREATE POLICY "Users can insert their own flashcards" ON flashcards
-    FOR INSERT WITH CHECK (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable insert access for all users" ON flashcards
+    FOR INSERT WITH CHECK (TRUE);
 
-CREATE POLICY "Users can update their own flashcards" ON flashcards
-    FOR UPDATE USING (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable update access for all users" ON flashcards
+    FOR UPDATE USING (TRUE);
 
-CREATE POLICY "Users can delete their own flashcards" ON flashcards
-    FOR DELETE USING (auth.uid()::text = user_id OR user_id IS NULL);
+CREATE POLICY "Enable delete access for all users" ON flashcards
+    FOR DELETE USING (TRUE);
 
 -- Grant necessary permissions
 GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO anon, authenticated;

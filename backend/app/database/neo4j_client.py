@@ -157,8 +157,10 @@ class Neo4jClient:
     
     async def create_relationship(
         self,
-        from_node: Dict[str, Any],
-        to_node: Dict[str, Any],
+        from_node_label: str,
+        from_node_props: Dict[str, Any],
+        to_node_label: str,
+        to_node_props: Dict[str, Any],
         relationship_type: str,
         properties: Optional[Dict[str, Any]] = None
     ):
@@ -166,8 +168,10 @@ class Neo4jClient:
         Create a relationship between two nodes
         
         Args:
-            from_node: Source node (must have type and identifier)
-            to_node: Target node (must have type and identifier)
+            from_node_label: Label of the source node
+            from_node_props: Properties to match the source node
+            to_node_label: Label of the target node
+            to_node_props: Properties to match the target node
             relationship_type: Type of relationship (e.g., MENTIONS, WORKS_FOR)
             properties: Additional relationship properties
         """
@@ -176,22 +180,29 @@ class Neo4jClient:
                 raise Exception("Neo4j driver not initialized")
             
             props = properties or {}
+
+            def props_to_cypher(props, var_name):
+                return "{" + ", ".join([f"{key}: ${var_name}_{key}" for key in props]) + "}"
+
+            from_props_str = props_to_cypher(from_node_props, "from")
+            to_props_str = props_to_cypher(to_node_props, "to")
             
             with self.driver.session() as session:
                 query = f"""
-                MATCH (from:{from_node['type']} {{name: $from_name}})
-                MATCH (to:{to_node['type']} {{name: $to_name}})
+                MATCH (from:{from_node_label} {from_props_str})
+                MATCH (to:{to_node_label} {to_props_str})
                 MERGE (from)-[r:{relationship_type}]->(to)
                 SET r += $properties
                 RETURN r
                 """
                 
-                session.run(
-                    query,
-                    from_name=from_node['name'],
-                    to_name=to_node['name'],
-                    properties=props
-                )
+                params = {"properties": props}
+                for key, val in from_node_props.items():
+                    params[f"from_{key}"] = val
+                for key, val in to_node_props.items():
+                    params[f"to_{key}"] = val
+
+                session.run(query, **params)
                 
         except Exception as e:
             print(f"Error creating relationship: {str(e)}")

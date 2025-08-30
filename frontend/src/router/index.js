@@ -63,16 +63,6 @@ const router = createRouter({
           "Learn about NewsNeuron's AI-powered news analysis technology",
       },
     },
-    {
-      path: "/dashboard",
-      name: "dashboard",
-      component: () => import("@/views/DashboardView.vue"),
-      meta: {
-        title: "Dashboard - NewsNeuron",
-        description: "Your personalized news analytics dashboard",
-        requiresAuth: false, // Set to true when auth is implemented
-      },
-    },
     // Catch-all 404 route
     {
       path: "/:pathMatch(.*)*",
@@ -98,42 +88,67 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const appStore = useAppStore();
 
-  // Set loading state
-  appStore.setLoading(true);
+  console.log('Router beforeEach:', { from: from.path, to: to.path, name: to.name });
 
-  // Update page title and meta
-  if (to.meta?.title) {
-    document.title = to.meta.title;
-  }
+  try {
+    // Set loading state
+    appStore.setLoading(true);
 
-  if (to.meta?.description) {
-    const metaDescription = document.querySelector('meta[name="description"]');
-    if (metaDescription) {
-      metaDescription.setAttribute("content", to.meta.description);
+    // Update page title and meta
+    if (to.meta?.title) {
+      document.title = to.meta.title;
     }
-  }
 
-  // Authentication check (when implemented)
-  if (to.meta?.requiresAuth) {
-    // Add authentication logic here
-    // For now, we'll just continue
-    console.log("Route requires authentication:", to.name);
-  }
+    if (to.meta?.description) {
+      const metaDescription = document.querySelector('meta[name="description"]');
+      if (metaDescription) {
+        metaDescription.setAttribute("content", to.meta.description);
+      }
+    }
 
-  next();
+    console.log('Router beforeEach: calling next()');
+    next();
+  } catch (error) {
+    console.error("Router beforeEach error:", error);
+    appStore.setLoading(false);
+    next();
+  }
 });
 
-router.afterEach((to) => {
+router.afterEach((to, from, failure) => {
   const appStore = useAppStore();
 
-  // Clear loading state
-  appStore.setLoading(false);
+  console.log('Router afterEach:', { from: from.path, to: to.path, failure });
 
-  // Analytics tracking (when implemented)
-  if (import.meta.env.VITE_GOOGLE_ANALYTICS_ID) {
-    // Track page view
-    console.log("Track page view:", to.path);
+  try {
+    // Clear loading state regardless of success/failure
+    appStore.setLoading(false);
+
+    // Log route changes for debugging
+    if (failure) {
+      console.error("Route navigation failed:", failure);
+    } else {
+      console.log("Route navigation successful:", to.path);
+    }
+
+    // Analytics tracking (when implemented)
+    if (import.meta.env.VITE_GOOGLE_ANALYTICS_ID) {
+      // Track page view
+      console.log("Track page view:", to.path);
+    }
+  } catch (error) {
+    console.error("Router afterEach error:", error);
+    // Ensure loading is cleared even if there's an error
+    appStore.setLoading(false);
   }
+});
+
+// Handle route errors
+router.onError((error) => {
+  console.error("Router error:", error);
+  const appStore = useAppStore();
+  appStore.setLoading(false);
+  appStore.setError("Failed to load page. Please try again.");
 });
 
 export default router;

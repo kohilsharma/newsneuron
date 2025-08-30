@@ -57,7 +57,7 @@ class DatabaseError(NewsNeuronError):
 
 
 class ExternalServiceError(NewsNeuronError):
-    """External service error (OpenAI, etc.)"""
+    """External service error (OpenRouter, Neo4j, Supabase, etc.)"""
     
     def __init__(self, message: str, service: str = None, details: Dict[str, Any] = None):
         super().__init__(
@@ -325,7 +325,7 @@ class ErrorContext:
         elif "psycopg2" in str(exc_type) or "sqlalchemy" in str(exc_type):
             # Database error
             raise handle_database_error(exc_val, self.operation)
-        elif self.service and ("openai" in str(exc_type).lower() or "http" in str(exc_type).lower()):
+        elif self.service and ("openrouter" in str(exc_type).lower() or "http" in str(exc_type).lower()):
             # External service error
             raise handle_external_service_error(exc_val, self.service)
         else:

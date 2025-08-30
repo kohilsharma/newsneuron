@@ -8,7 +8,7 @@ from typing import Dict, Any, List
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.schemas import FlashcardRequest, FlashcardResponse, Flashcard
-from app.dependencies import get_hybrid_retriever, get_current_user
+from app.dependencies import get_hybrid_retriever
 from app.services.hybrid_retriever import HybridRetriever
 from app.services.flashcard_generator import FlashcardGenerator
 
@@ -19,7 +19,6 @@ router = APIRouter()
 async def generate_flashcards(
     request: FlashcardRequest,
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Generate AI-summarized flashcards from recent news
@@ -37,7 +36,6 @@ async def generate_flashcards(
             topics=request.topics,
             date_range=request.date_range,
             limit=request.limit,
-            user_id=current_user.get("id")
         )
         
         response = FlashcardResponse(
@@ -64,7 +62,6 @@ async def get_recent_flashcards(
     topics: List[str] = Query(None, description="Filter by topics"),
     days_back: int = Query(7, description="How many days back to look", ge=1, le=30),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get recently generated flashcards
@@ -94,7 +91,6 @@ async def get_recent_flashcards(
             topics=request.topics,
             date_range=request.date_range,
             limit=request.limit,
-            user_id=current_user.get("id")
         )
         
         return FlashcardResponse(
@@ -113,7 +109,6 @@ async def get_recent_flashcards(
 @router.get("/{flashcard_id}")
 async def get_flashcard_details(
     flashcard_id: str,
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get detailed information about a specific flashcard
@@ -153,7 +148,6 @@ async def get_flashcard_details(
 async def get_trending_topics(
     limit: int = Query(10, description="Number of trending topics", ge=1, le=20),
     days_back: int = Query(7, description="Time period for trending analysis", ge=1, le=30),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get trending topics for flashcard generation

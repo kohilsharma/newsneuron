@@ -49,6 +49,17 @@ export const useAppStore = defineStore("app", () => {
 
   function setLoading(loading) {
     isLoading.value = loading;
+
+    // Add a safety timeout to prevent infinite loading states
+    if (loading) {
+      // Clear loading after 30 seconds as a safety measure
+      setTimeout(() => {
+        if (isLoading.value) {
+          console.warn("Loading state was stuck for 30 seconds, clearing automatically");
+          isLoading.value = false;
+        }
+      }, 30000);
+    }
   }
 
   function toggleSidebar() {

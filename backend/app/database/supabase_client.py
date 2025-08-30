@@ -24,11 +24,19 @@ class SupabaseClient:
                 print("Warning: Supabase credentials not configured")
                 return
             
-            self.client = create_client(
-                settings.supabase_url,
-                settings.supabase_anon_key
-            )
-            print("Supabase client initialized successfully")
+            # Use service role key for backend operations if available, otherwise anon key
+            if settings.supabase_service_role_key:
+                self.client = create_client(
+                    settings.supabase_url,
+                    settings.supabase_service_role_key
+                )
+                print("Supabase client initialized with service role key")
+            else:
+                self.client = create_client(
+                    settings.supabase_url,
+                    settings.supabase_anon_key
+                )
+                print("Supabase client initialized with anonymous key")
             
         except Exception as e:
             print(f"Failed to initialize Supabase client: {str(e)}")
@@ -68,6 +76,19 @@ class SupabaseClient:
         except Exception as e:
             print(f"Error inserting article: {str(e)}")
             raise
+
+    async def insert_articles_bulk(self, articles: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Bulk insert articles"""
+        try:
+            if not self.client:
+                raise Exception("Supabase client not initialized")
+            if not articles:
+                return []
+            response = self.client.table("articles").insert(articles).execute()
+            return response.data if response.data else []
+        except Exception as e:
+            print(f"Error bulk inserting articles: {str(e)}")
+            return []
     
     async def search_articles_by_similarity(
         self,
@@ -107,6 +128,70 @@ class SupabaseClient:
             
         except Exception as e:
             print(f"Error in similarity search: {str(e)}")
+            return []
+
+    async def insert_chunk(self, article_id: int, chunk_index: int, content: str, embedding: Optional[List[float]]) -> Optional[Dict[str, Any]]:
+        """
+        Insert a single chunk row
+        """
+        try:
+            if not self.client:
+                raise Exception("Supabase client not initialized")
+
+            data = {
+                "article_id": article_id,
+                "chunk_index": chunk_index,
+                "content": content
+            }
+            if embedding is not None:
+                data["embedding"] = f"[{','.join(map(str, embedding))}]"
+
+            response = self.client.table("chunks").insert(data).execute()
+            return response.data[0] if response.data else None
+        except Exception as e:
+            print(f"Error inserting chunk: {str(e)}")
+            return None
+
+    async def insert_chunks_bulk(self, rows: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+        """Bulk insert chunk rows"""
+        try:
+            if not self.client:
+                raise Exception("Supabase client not initialized")
+            if not rows:
+                return []
+            response = self.client.table("chunks").insert(rows).execute()
+            return response.data if response.data else []
+        except Exception as e:
+            print(f"Error bulk inserting chunks: {str(e)}")
+            return []
+
+    async def search_chunks_by_similarity(
+        self,
+        query_embedding: List[float],
+        limit: int = 20,
+        similarity_threshold: float = 0.78
+    ) -> List[Dict[str, Any]]:
+        """
+        Semantic search over chunks
+        """
+        try:
+            if not self.client:
+                raise Exception("Supabase client not initialized")
+
+            embedding_str = f"[{','.join(map(str, query_embedding))}]"
+
+            response = self.client.rpc(
+                "match_chunks",
+                {
+                    "query_embedding": embedding_str,
+                    "match_threshold": similarity_threshold,
+                    "match_count": limit
+                }
+            ).execute()
+
+            return response.data if response.data else []
+        except Exception as e:
+            print(f"Error in chunk similarity search: {str(e)}")
             return []
     
     async def get_article_by_id(self, article_id: int) -> Optional[Dict[str, Any]]:
@@ -181,6 +266,10 @@ class SupabaseClient:
             if not self.client:
                 raise Exception("Supabase client not initialized")
             
+            # Try to find exact name first to prevent duplicates
+            existing = self.client.table("entities").select("*").eq("name", entity_data.get("name")).limit(1).execute()
+            if existing.data:
+                return existing.data[0]
             response = self.client.table("entities").insert(entity_data).execute()
             
             if response.data:
@@ -239,10 +328,14 @@ class SupabaseClient:
             if not self.client:
                 raise Exception("Supabase client not initialized")
             
+            # If exact match requested (used internally for dedup), shortcut
             query_builder = self.client.table("entities").select("*")
-            
-            # Add text search
-            query_builder = query_builder.ilike("name", f"%{query}%")
+            if query.startswith("="):
+                exact = query[1:]
+                query_builder = query_builder.eq("name", exact)
+            else:
+                # Add text search
+                query_builder = query_builder.ilike("name", f"%{query}%")
             
             # Add type filter if specified
             if entity_type:

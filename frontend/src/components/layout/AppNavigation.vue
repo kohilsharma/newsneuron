@@ -21,16 +21,16 @@
 
         <!-- Desktop Navigation -->
         <div class="hidden md:flex items-center space-x-1">
-          <RouterLink
+          <button
             v-for="item in navigationItems"
             :key="item.name"
-            :to="item.to"
+            @click="navigateToRoute(item)"
             class="nav-link"
             :class="{ 'nav-link-active': $route.name === item.name }"
           >
             <component :is="item.icon" class="w-4 h-4" />
             <span>{{ item.label }}</span>
-          </RouterLink>
+          </button>
         </div>
 
         <!-- Right Side Actions -->
@@ -99,17 +99,16 @@
       class="md:hidden border-t border-gray-200 bg-white"
     >
       <div class="px-4 py-3 space-y-1">
-        <RouterLink
+        <button
           v-for="item in navigationItems"
           :key="item.name"
-          :to="item.to"
+          @click="handleMobileNavigationClick(item)"
           class="mobile-nav-link"
           :class="{ 'mobile-nav-link-active': $route.name === item.name }"
-          @click="mobileMenuOpen = false"
         >
           <component :is="item.icon" class="w-5 h-5" />
           <span>{{ item.label }}</span>
-        </RouterLink>
+        </button>
       </div>
     </div>
 
@@ -120,7 +119,7 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute, useRouter } from "vue-router";
 import { useAppStore } from "@/stores/app";
 
 // Icons
@@ -144,6 +143,10 @@ import QuickSearchModal from "@/components/ui/QuickSearchModal.vue";
 
 // Store
 const appStore = useAppStore();
+
+// Route
+const $route = useRoute();
+const $router = useRouter();
 
 // State
 const mobileMenuOpen = ref(false);
@@ -180,15 +183,22 @@ const navigationItems = [
     to: "/timeline",
     icon: ClockIcon,
   },
-  {
-    name: "dashboard",
-    label: "Dashboard",
-    to: "/dashboard",
-    icon: ChartBarIcon,
-  },
 ];
 
 // Methods
+function navigateToRoute(item) {
+  console.log('Navigation clicked:', item.name, item.to);
+  console.log('Current route:', $route.path, 'Target route:', item.to);
+  $router.push(item.to);
+}
+
+function handleMobileNavigationClick(item) {
+  console.log('Mobile navigation clicked:', item.name, item.to);
+  mobileMenuOpen.value = false;
+  console.log('Current route:', $route.path, 'Target route:', item.to);
+  $router.push(item.to);
+}
+
 function openQuickSearch() {
   quickSearchOpen.value = true;
 }
@@ -219,7 +229,7 @@ onUnmounted(() => {
 
 <style scoped>
 .nav-link {
-  @apply flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:text-gray-900 hover:bg-gray-100 transition-all duration-200;
+  @apply flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 cursor-pointer;
 }
 
 .nav-link-active {
@@ -227,7 +237,7 @@ onUnmounted(() => {
 }
 
 .mobile-nav-link {
-  @apply flex items-center space-x-3 px-3 py-2 text-base font-medium text-gray-600 rounded-lg hover:text-gray-900 hover:bg-gray-100 transition-all duration-200;
+  @apply flex items-center space-x-3 px-3 py-2 text-base font-medium text-gray-600 rounded-lg hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 cursor-pointer w-full text-left;
 }
 
 .mobile-nav-link-active {

@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.schemas import TimelineRequest, TimelineResponse, TimelineEvent
-from app.dependencies import get_hybrid_retriever, get_current_user
+from app.dependencies import get_hybrid_retriever
 from app.services.hybrid_retriever import HybridRetriever
 from app.services.timeline_generator import TimelineGenerator
 
@@ -19,7 +19,6 @@ router = APIRouter()
 async def generate_timeline(
     request: TimelineRequest,
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Generate timeline for a specific entity
@@ -38,7 +37,6 @@ async def generate_timeline(
             start_date=request.start_date,
             end_date=request.end_date,
             limit=request.limit,
-            user_id=current_user.get("id")
         )
         
         # Convert events to response format
@@ -83,7 +81,6 @@ async def get_entity_timeline(
     end_date: Optional[datetime] = Query(None, description="Timeline end date"),
     limit: int = Query(50, description="Maximum timeline events", ge=1, le=100),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     GET endpoint for entity timeline (alternative to POST)
@@ -95,7 +92,7 @@ async def get_entity_timeline(
         limit=limit
     )
     
-    return await generate_timeline(request, retriever, current_user)
+    return await generate_timeline(request, retriever)
 
 
 @router.get("/{entity_name}/summary")
@@ -103,7 +100,6 @@ async def get_timeline_summary(
     entity_name: str,
     days_back: int = Query(30, description="Days to look back", ge=1, le=365),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get a summary of entity timeline activity
@@ -152,7 +148,6 @@ async def get_related_entities_timeline(
     max_depth: int = Query(2, description="Maximum relationship depth", ge=1, le=3),
     limit: int = Query(20, description="Maximum related entities", ge=1, le=50),
     retriever: HybridRetriever = Depends(get_hybrid_retriever),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get timeline information for entities related to the specified entity
@@ -195,7 +190,6 @@ async def get_related_entities_timeline(
 async def get_trending_events(
     days_back: int = Query(7, description="Days to analyze", ge=1, le=30),
     limit: int = Query(10, description="Maximum trending events", ge=1, le=20),
-    current_user: Dict[str, Any] = Depends(get_current_user)
 ):
     """
     Get trending events across all timelines

@@ -23,7 +23,6 @@ class TimelineGenerator:
         start_date: Optional[datetime] = None,
         end_date: Optional[datetime] = None,
         limit: int = 50,
-        user_id: Optional[str] = None
     ) -> Dict[str, Any]:
         """
         Generate timeline for a specific entity
@@ -33,7 +32,6 @@ class TimelineGenerator:
             start_date: Optional start date for timeline
             end_date: Optional end date for timeline
             limit: Maximum number of timeline events
-            user_id: Optional user identifier
         
         Returns:
             Dictionary with timeline events and metadata

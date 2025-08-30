@@ -60,8 +60,16 @@ You'll need accounts for the following services:
 
 - [Supabase](https://supabase.com/) - Vector database
 - [Neo4j AuraDB](https://neo4j.com/cloud/aura/) - Knowledge graph
-- [OpenRouter](https://openrouter.ai/) - AI model routing
+- [OpenRouter](https://openrouter.ai/) - AI model routing (optional for LLMs)
 - [Vercel](https://vercel.com/) - Deployment
+
+### 🆓 Free Embeddings
+
+NewsNeuron uses **completely free** local embeddings by default:
+- **No API costs** - Uses sentence-transformers locally
+- **Lightweight** - CPU-only, 384-dimensional vectors
+- **Private** - All processing stays on your server
+- **Fast** - Optimized for semantic search
 
 ## 🚀 Quick Start
 
@@ -151,7 +159,7 @@ python data-processing/ingest.py
 
 This will:
 1. Process news articles from your dataset
-2. Generate embeddings using OpenAI
+2. Generate embeddings using free local models
 3. Extract entities using spaCy NER
 4. Populate both Supabase and Neo4j databases
 
@@ -202,7 +210,6 @@ NEO4J_URI=your_neo4j_uri
 NEO4J_USERNAME=your_neo4j_username
 NEO4J_PASSWORD=your_neo4j_password
 OPENROUTER_API_KEY=your_openrouter_api_key
-OPENAI_API_KEY=your_openai_api_key
 ```
 
 **Frontend (.env)**

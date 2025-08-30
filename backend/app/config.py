@@ -30,24 +30,25 @@ class Settings(BaseSettings):
     neo4j_username: str = "neo4j"
     neo4j_password: str = ""
     
-    # AI Services
-    openai_api_key: str = ""
+    # AI Services - OpenRouter for LLM responses (no OpenAI dependency)
     openrouter_api_key: str = ""
-    
-    # Security
-    secret_key: str = ""
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
     
     # Redis (optional)
     redis_url: str = "redis://localhost:6379"
     
-    # Embedding settings
-    embedding_model: str = "text-embedding-ada-002"
-    embedding_dimension: int = 1536
+    # Free Local Embedding settings
+    use_local_embeddings: bool = True  # Always use free local models
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"  # Free, lightweight model
+    embedding_dimension: int = 384  # all-MiniLM-L6-v2 dimensions
     
-    # LLM settings
-    default_llm_model: str = "openai/gpt-4-turbo-preview"
+    # Free embedding model options:
+    # - sentence-transformers/all-MiniLM-L6-v2: 384 dimensions (fast, lightweight, default)
+    # - sentence-transformers/all-MiniLM-L12-v2: 384 dimensions (slightly better quality)
+    # - intfloat/e5-small-v2: 384 dimensions (efficient)
+    # - BAAI/bge-small-en-v1.5: 384 dimensions (good performance)
+    
+    # LLM settings (OpenRouter model slug)
+    default_llm_model: str = "deepseek/deepseek-chat-v3.1:free"
     max_tokens: int = 2000
     temperature: float = 0.7
     
@@ -58,6 +59,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = False
+        extra = "ignore"
 
 
 # Global settings instance
