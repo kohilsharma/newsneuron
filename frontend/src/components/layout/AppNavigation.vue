@@ -1,246 +1,253 @@
 <template>
-  <nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
-        <!-- Logo and Brand -->
-        <div class="flex items-center">
-          <RouterLink to="/" class="flex items-center space-x-3 group">
-            <div
-              class="w-8 h-8 bg-gradient-to-r from-primary-600 to-accent-600 rounded-lg flex items-center justify-center"
-            >
-              <span class="text-white font-bold text-sm">NN</span>
+  <nav class="navbar bg-neuron-bg-content border-b border-neuron-border sticky top-0 z-50 backdrop-blur-sm">
+    <div class="navbar-container max-w-8xl mx-auto px-6 py-4">
+      <div class="flex items-center justify-between">
+        
+        <!-- Left: Logo & Brand -->
+        <div class="flex items-center space-x-6">
+          <div class="flex items-center space-x-3">
+            <NeuronLogo class="w-8 h-8 text-neuron-glow animate-synapse-pulse" />
+            <div class="flex flex-col">
+              <h1 class="text-lg font-ui font-bold text-gradient">NewsNeuron</h1>
+              <p class="text-xs text-neuron-text-secondary">AI News Analysis</p>
             </div>
-            <div class="hidden sm:block">
-              <h1 class="text-xl font-bold text-gradient">NewsNeuron</h1>
-              <p class="text-xs text-gray-500 -mt-1">
-                Where News Meets Intelligence
-              </p>
-            </div>
-          </RouterLink>
-        </div>
-
-        <!-- Desktop Navigation -->
-        <div class="hidden md:flex items-center space-x-1">
-          <button
-            v-for="item in navigationItems"
-            :key="item.name"
-            @click="navigateToRoute(item)"
-            class="nav-link"
-            :class="{ 'nav-link-active': $route.name === item.name }"
-          >
-            <component :is="item.icon" class="w-4 h-4" />
-            <span>{{ item.label }}</span>
-          </button>
-        </div>
-
-        <!-- Right Side Actions -->
-        <div class="flex items-center space-x-3">
-          <!-- Search Button -->
-          <button
-            @click="openQuickSearch"
-            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-            title="Quick Search (Ctrl+K)"
-          >
-            <MagnifyingGlassIcon class="w-5 h-5" />
-          </button>
-
-          <!-- Theme Toggle -->
-          <button
-            @click="appStore.toggleTheme()"
-            class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-            :title="isDarkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
-          >
-            <SunIcon v-if="isDarkMode" class="w-5 h-5" />
-            <MoonIcon v-else class="w-5 h-5" />
-          </button>
-
-          <!-- Notifications -->
-          <div class="relative">
-            <button
-              @click="showNotifications = !showNotifications"
-              class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
-              title="Notifications"
-            >
-              <BellIcon class="w-5 h-5" />
-              <span
-                v-if="unreadNotifications.length > 0"
-                class="absolute -top-1 -right-1 w-3 h-3 bg-error-500 text-white text-xs rounded-full flex items-center justify-center"
-              >
-                {{
-                  unreadNotifications.length > 9
-                    ? "9+"
-                    : unreadNotifications.length
-                }}
-              </span>
-            </button>
-
-            <!-- Notifications Dropdown -->
-            <NotificationDropdown
-              v-if="showNotifications"
-              @close="showNotifications = false"
-            />
           </div>
-
-          <!-- Mobile Menu Button -->
-          <button
-            @click="mobileMenuOpen = !mobileMenuOpen"
-            class="md:hidden p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors duration-200"
+          
+          <!-- Desktop Navigation Links -->
+          <div class="hidden lg:flex items-center space-x-1">
+            <NavLink
+              to="/"
+              :icon="LayoutDashboard"
+              horizontal
+            >
+              Dashboard
+            </NavLink>
+            
+            <NavLink
+              to="/chat"
+              :icon="MessageSquare"
+              horizontal
+            >
+              Chat
+            </NavLink>
+            
+            <NavLink
+              to="/search"
+              :icon="Search"
+              horizontal
+            >
+              Search
+            </NavLink>
+            
+            <NavLink
+              to="/timeline"
+              :icon="Clock"
+              horizontal
+            >
+              Timeline
+            </NavLink>
+            
+            <NavLink
+              to="/flashcards"
+              :icon="BookOpen"
+              horizontal
+              :badge="flashcardCount > 0 ? flashcardCount.toString() : null"
+            >
+              Flashcards
+            </NavLink>
+            
+            <NavLink
+              to="/about"
+              :icon="HelpCircle"
+              horizontal
+            >
+              About
+            </NavLink>
+          </div>
+        </div>
+        
+        <!-- Right: Status & Actions -->
+        <div class="flex items-center space-x-4">
+          
+          <!-- Neural Status Indicator -->
+          <div class="hidden md:flex items-center space-x-2">
+            <div class="flex items-center space-x-1">
+              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <span class="text-xs text-green-400 font-medium">Neural Active</span>
+            </div>
+            
+            <!-- Mini Activity Bars -->
+            <div class="flex space-x-1">
+              <div 
+                v-for="i in 4" 
+                :key="i"
+                class="w-1 h-4 bg-neuron-glow/20 rounded-full overflow-hidden"
+              >
+                <div 
+                  class="h-full bg-gradient-to-t from-neuron-glow to-neuron-glow-hover animate-pulse"
+                  :style="{ height: Math.random() * 100 + '%' }"
+                ></div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Settings Button -->
+          <button class="btn-icon p-2">
+            <Settings class="w-5 h-5" />
+          </button>
+          
+          <!-- Mobile Menu Toggle -->
+          <button 
+            @click="showMobileMenu = !showMobileMenu"
+            class="lg:hidden btn-icon p-2"
+            :aria-label="showMobileMenu ? 'Close menu' : 'Open menu'"
           >
-            <Bars3Icon v-if="!mobileMenuOpen" class="w-5 h-5" />
-            <XMarkIcon v-else class="w-5 h-5" />
+            <Menu v-if="!showMobileMenu" class="w-5 h-5" />
+            <X v-else class="w-5 h-5" />
           </button>
         </div>
       </div>
-    </div>
-
-    <!-- Mobile Navigation Menu -->
-    <div
-      v-if="mobileMenuOpen"
-      class="md:hidden border-t border-gray-200 bg-white"
-    >
-      <div class="px-4 py-3 space-y-1">
-        <button
-          v-for="item in navigationItems"
-          :key="item.name"
-          @click="handleMobileNavigationClick(item)"
-          class="mobile-nav-link"
-          :class="{ 'mobile-nav-link-active': $route.name === item.name }"
-        >
-          <component :is="item.icon" class="w-5 h-5" />
-          <span>{{ item.label }}</span>
-        </button>
+      
+      <!-- Mobile Menu -->
+      <div 
+        v-if="showMobileMenu"
+        class="lg:hidden mt-4 pt-4 border-t border-neuron-border"
+      >
+        <div class="grid grid-cols-2 gap-2">
+          <NavLink
+            to="/"
+            :icon="LayoutDashboard"
+            mobile
+            @click="showMobileMenu = false"
+          >
+            Dashboard
+          </NavLink>
+          
+          <NavLink
+            to="/chat"
+            :icon="MessageSquare"
+            mobile
+            @click="showMobileMenu = false"
+          >
+            Chat
+          </NavLink>
+          
+          <NavLink
+            to="/search"
+            :icon="Search"
+            mobile
+            @click="showMobileMenu = false"
+          >
+            Search
+          </NavLink>
+          
+          <NavLink
+            to="/timeline"
+            :icon="Clock"
+            mobile
+            @click="showMobileMenu = false"
+          >
+            Timeline
+          </NavLink>
+          
+          <NavLink
+            to="/flashcards"
+            :icon="BookOpen"
+            mobile
+            :badge="flashcardCount > 0 ? flashcardCount.toString() : null"
+            @click="showMobileMenu = false"
+          >
+            Flashcards
+          </NavLink>
+          
+          <NavLink
+            to="/about"
+            :icon="HelpCircle"
+            mobile
+            @click="showMobileMenu = false"
+          >
+            About
+          </NavLink>
+        </div>
+        
+        <!-- Mobile Neural Status -->
+        <div class="mt-4 pt-4 border-t border-neuron-border flex items-center justify-center space-x-2">
+          <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <span class="text-xs text-green-400 font-medium">Neural System Active</span>
+        </div>
       </div>
     </div>
-
-    <!-- Quick Search Modal -->
-    <QuickSearchModal v-if="quickSearchOpen" @close="quickSearchOpen = false" />
   </nav>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import { RouterLink, useRoute, useRouter } from "vue-router";
-import { useAppStore } from "@/stores/app";
+import { ref, computed } from 'vue'
+import { useFlashcardsStore } from '@/stores/flashcards'
 
 // Icons
 import {
-  MagnifyingGlassIcon,
-  BellIcon,
-  SunIcon,
-  MoonIcon,
-  Bars3Icon,
-  XMarkIcon,
-  HomeIcon,
-  ChatBubbleLeftRightIcon,
-  RectangleStackIcon,
-  ClockIcon,
-  ChartBarIcon,
-} from "@heroicons/vue/24/outline";
+  LayoutDashboard,
+  MessageSquare,
+  Search,
+  Clock,
+  BookOpen,
+  HelpCircle,
+  Settings,
+  Menu,
+  X
+} from 'lucide-vue-next'
 
 // Components
-import NotificationDropdown from "@/components/ui/NotificationDropdown.vue";
-import QuickSearchModal from "@/components/ui/QuickSearchModal.vue";
-
-// Store
-const appStore = useAppStore();
-
-// Route
-const $route = useRoute();
-const $router = useRouter();
+import NavLink from './NavLink.vue'
+import NeuronLogo from '@/components/ui/NeuronLogo.vue'
 
 // State
-const mobileMenuOpen = ref(false);
-const showNotifications = ref(false);
-const quickSearchOpen = ref(false);
+const showMobileMenu = ref(false)
+
+// Store
+const flashcardsStore = useFlashcardsStore()
 
 // Computed
-const isDarkMode = computed(() => appStore.isDarkMode);
-const unreadNotifications = computed(() => appStore.unreadNotifications);
-
-// Navigation items
-const navigationItems = [
-  {
-    name: "home",
-    label: "Home",
-    to: "/",
-    icon: HomeIcon,
-  },
-  {
-    name: "chat",
-    label: "AI Chat",
-    to: "/chat",
-    icon: ChatBubbleLeftRightIcon,
-  },
-  {
-    name: "flashcards",
-    label: "Flashcards",
-    to: "/flashcards",
-    icon: RectangleStackIcon,
-  },
-  {
-    name: "timeline",
-    label: "Timeline",
-    to: "/timeline",
-    icon: ClockIcon,
-  },
-];
-
-// Methods
-function navigateToRoute(item) {
-  console.log('Navigation clicked:', item.name, item.to);
-  console.log('Current route:', $route.path, 'Target route:', item.to);
-  $router.push(item.to);
-}
-
-function handleMobileNavigationClick(item) {
-  console.log('Mobile navigation clicked:', item.name, item.to);
-  mobileMenuOpen.value = false;
-  console.log('Current route:', $route.path, 'Target route:', item.to);
-  $router.push(item.to);
-}
-
-function openQuickSearch() {
-  quickSearchOpen.value = true;
-}
-
-function handleKeydown(event) {
-  // Ctrl+K or Cmd+K for quick search
-  if ((event.ctrlKey || event.metaKey) && event.key === "k") {
-    event.preventDefault();
-    openQuickSearch();
-  }
-
-  // Escape to close mobile menu
-  if (event.key === "Escape") {
-    mobileMenuOpen.value = false;
-    showNotifications.value = false;
-  }
-}
-
-// Lifecycle
-onMounted(() => {
-  document.addEventListener("keydown", handleKeydown);
-});
-
-onUnmounted(() => {
-  document.removeEventListener("keydown", handleKeydown);
-});
+const flashcardCount = computed(() => flashcardsStore.flashcards.length)
 </script>
 
 <style scoped>
-.nav-link {
-  @apply flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 rounded-lg hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 cursor-pointer;
+/* Navbar Styles */
+.navbar {
+  background: rgba(32, 35, 42, 0.95);
+  backdrop-filter: blur(8px);
 }
 
-.nav-link-active {
-  @apply text-primary-600 bg-primary-50 hover:text-primary-700 hover:bg-primary-100;
+/* Text Gradient for Brand */
+.text-gradient {
+  background: linear-gradient(135deg, theme('colors.neuron.glow'), theme('colors.neuron.glow-hover'));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.mobile-nav-link {
-  @apply flex items-center space-x-3 px-3 py-2 text-base font-medium text-gray-600 rounded-lg hover:text-gray-900 hover:bg-gray-100 transition-all duration-200 cursor-pointer w-full text-left;
+/* Responsive container */
+.navbar-container {
+  max-width: 1440px;
 }
 
-.mobile-nav-link-active {
-  @apply text-primary-600 bg-primary-50 hover:text-primary-700 hover:bg-primary-100;
+/* Mobile menu animation */
+.mobile-menu-enter-active,
+.mobile-menu-leave-active {
+  transition: all 0.3s ease;
+}
+
+.mobile-menu-enter-from,
+.mobile-menu-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Animation Performance */
+@media (prefers-reduced-motion: reduce) {
+  .animate-pulse,
+  .animate-synapse-pulse {
+    animation: none !important;
+  }
 }
 </style>
