@@ -1,17 +1,29 @@
 <template>
-  <nav class="navbar bg-neuron-bg-content border-b border-neuron-border sticky top-0 z-50 backdrop-blur-sm">
-    <div class="navbar-container max-w-8xl mx-auto px-6 py-4">
+  <nav class="navbar bg-gradient-to-r from-neuron-bg-content via-slate-800/60 to-neuron-bg-content border-b border-neuron-border/30 sticky top-0 z-50 backdrop-blur-md">
+    <div class="navbar-container max-w-8xl mx-auto px-6 py-3">
       <div class="flex items-center justify-between">
         
         <!-- Left: Logo & Brand -->
         <div class="flex items-center space-x-6">
-          <div class="flex items-center space-x-3">
-            <NeuronLogo class="w-8 h-8 text-neuron-glow animate-synapse-pulse" />
+          <router-link 
+            to="/" 
+            class="logo-brand group flex items-center space-x-3 hover:scale-105 transition-all duration-300 cursor-pointer rounded-lg p-2 hover:bg-neuron-bg-primary/30"
+          >
+            <NeuronLogo 
+              class="w-10 h-10 text-logo-primary group-hover:text-logo-secondary transition-all duration-300" 
+              :animated="true"
+              :primaryColor="'#8B5CF6'"
+              :secondaryColor="'#A855F7'"
+            />
             <div class="flex flex-col">
-              <h1 class="text-lg font-ui font-bold text-gradient">NewsNeuron</h1>
-              <p class="text-xs text-neuron-text-secondary">AI News Analysis</p>
+              <h1 class="text-lg font-display font-semibold logo-text-gradient group-hover:scale-105 transition-all duration-300">
+                NewsNeuron
+              </h1>
+              <p class="text-xs font-sans text-neuron-text-secondary/80 group-hover:text-logo-primary transition-colors duration-300">
+                AI News Analysis
+              </p>
             </div>
-          </div>
+          </router-link>
           
           <!-- Desktop Navigation Links -->
           <div class="hidden lg:flex items-center space-x-1">
@@ -32,22 +44,6 @@
             </NavLink>
             
             <NavLink
-              to="/search"
-              :icon="Search"
-              horizontal
-            >
-              Search
-            </NavLink>
-            
-            <NavLink
-              to="/timeline"
-              :icon="Clock"
-              horizontal
-            >
-              Timeline
-            </NavLink>
-            
-            <NavLink
               to="/flashcards"
               :icon="BookOpen"
               horizontal
@@ -57,44 +53,27 @@
             </NavLink>
             
             <NavLink
-              to="/about"
-              :icon="HelpCircle"
+              to="/timeline"
+              :icon="Clock"
               horizontal
             >
-              About
+              Timeline
             </NavLink>
           </div>
         </div>
         
-        <!-- Right: Status & Actions -->
+        <!-- Right: Search Only -->
         <div class="flex items-center space-x-4">
           
-          <!-- Neural Status Indicator -->
-          <div class="hidden md:flex items-center space-x-2">
-            <div class="flex items-center space-x-1">
-              <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-              <span class="text-xs text-green-400 font-medium">Neural Active</span>
-            </div>
-            
-            <!-- Mini Activity Bars -->
-            <div class="flex space-x-1">
-              <div 
-                v-for="i in 4" 
-                :key="i"
-                class="w-1 h-4 bg-neuron-glow/20 rounded-full overflow-hidden"
-              >
-                <div 
-                  class="h-full bg-gradient-to-t from-neuron-glow to-neuron-glow-hover animate-pulse"
-                  :style="{ height: Math.random() * 100 + '%' }"
-                ></div>
-              </div>
-            </div>
-          </div>
-          
-          <!-- Settings Button -->
-          <button class="btn-icon p-2">
-            <Settings class="w-5 h-5" />
-          </button>
+          <!-- Search Button -->
+          <NavLink
+            to="/search"
+            :icon="Search"
+            horizontal
+            class="bg-neuron-bg-content/50 border border-neuron-border/50 hover:border-neuron-glow/30 px-4 py-1.5 rounded-lg text-sm"
+          >
+            <span class="hidden md:inline">Search</span>
+          </NavLink>
           
           <!-- Mobile Menu Toggle -->
           <button 
@@ -111,7 +90,7 @@
       <!-- Mobile Menu -->
       <div 
         v-if="showMobileMenu"
-        class="lg:hidden mt-4 pt-4 border-t border-neuron-border"
+        class="lg:hidden mt-4 pt-4 border-t border-neuron-border/30"
       >
         <div class="grid grid-cols-2 gap-2">
           <NavLink
@@ -159,21 +138,6 @@
           >
             Flashcards
           </NavLink>
-          
-          <NavLink
-            to="/about"
-            :icon="HelpCircle"
-            mobile
-            @click="showMobileMenu = false"
-          >
-            About
-          </NavLink>
-        </div>
-        
-        <!-- Mobile Neural Status -->
-        <div class="mt-4 pt-4 border-t border-neuron-border flex items-center justify-center space-x-2">
-          <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-          <span class="text-xs text-green-400 font-medium">Neural System Active</span>
         </div>
       </div>
     </div>
@@ -191,8 +155,6 @@ import {
   Search,
   Clock,
   BookOpen,
-  HelpCircle,
-  Settings,
   Menu,
   X
 } from 'lucide-vue-next'
@@ -214,8 +176,16 @@ const flashcardCount = computed(() => flashcardsStore.flashcards.length)
 <style scoped>
 /* Navbar Styles */
 .navbar {
-  background: rgba(32, 35, 42, 0.95);
-  backdrop-filter: blur(8px);
+  background: linear-gradient(90deg, 
+    rgba(22, 27, 34, 0.95) 0%, 
+    rgba(32, 39, 49, 0.95) 25%,
+    rgba(45, 55, 72, 0.95) 50%,
+    rgba(32, 39, 49, 0.95) 75%,
+    rgba(22, 27, 34, 0.95) 100%
+  );
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(48, 54, 61, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Text Gradient for Brand */
@@ -249,5 +219,11 @@ const flashcardCount = computed(() => flashcardsStore.flashcards.length)
   .animate-synapse-pulse {
     animation: none !important;
   }
+}
+
+/* Remove focus outlines from buttons */
+button:focus {
+  outline: none;
+  box-shadow: none;
 }
 </style>

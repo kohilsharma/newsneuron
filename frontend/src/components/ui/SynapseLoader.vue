@@ -172,7 +172,7 @@
     <!-- Loading text (optional) -->
     <div 
       v-if="showText" 
-      class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-neuron-text-secondary text-sm font-ui"
+      class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 text-neuron-text-secondary text-sm font-heading"
     >
       {{ loadingText }}
     </div>

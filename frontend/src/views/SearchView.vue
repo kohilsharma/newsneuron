@@ -5,8 +5,8 @@
       <div class="max-w-7xl mx-auto px-6 py-8">
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-3xl font-bold text-text-primary mb-2">Semantic Search</h1>
-            <p class="text-text-secondary">
+            <h1 class="text-3xl text-display text-text-primary mb-2">Semantic Search</h1>
+            <p class="text-body-sans text-text-secondary">
               AI-powered search through news articles and entity connections
             </p>
           </div>

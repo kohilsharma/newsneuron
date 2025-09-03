@@ -11,7 +11,7 @@
         
         <!-- Loading message -->
         <div class="text-center">
-          <p class="text-neuron-text-primary font-ui font-medium">{{ title }}</p>
+          <p class="text-neuron-text-primary font-heading font-medium">{{ title }}</p>
           <p v-if="message" class="text-neuron-text-secondary text-sm mt-1">{{ message }}</p>
         </div>
       </div>

@@ -9,12 +9,12 @@
       </div>
 
       <h3
-        class="text-lg font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors duration-200"
+        class="text-lg text-heading text-neuron-text-primary mb-2 group-hover:text-neuron-glow transition-colors duration-200"
       >
         {{ feature.title }}
       </h3>
 
-      <p class="text-gray-600 text-sm">
+      <p class="text-neuron-text-secondary font-body">
         {{ feature.description }}
       </p>
     </div>

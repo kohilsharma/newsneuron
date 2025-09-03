@@ -16,7 +16,7 @@
     <!-- Label -->
     <span 
       v-if="showLabel" 
-      class="font-ui font-medium transition-all duration-200"
+      class="font-heading font-medium transition-all duration-200"
       :class="labelClasses"
     >
       <slot />

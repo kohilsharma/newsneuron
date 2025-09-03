@@ -53,16 +53,6 @@ const router = createRouter({
         description: "Advanced semantic search through news articles",
       },
     },
-    {
-      path: "/about",
-      name: "about",
-      component: () => import("@/views/AboutView.vue"),
-      meta: {
-        title: "About - NewsNeuron",
-        description:
-          "Learn about NewsNeuron's AI-powered news analysis technology",
-      },
-    },
     // Catch-all 404 route
     {
       path: "/:pathMatch(.*)*",

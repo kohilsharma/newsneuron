@@ -23,8 +23,8 @@
               <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-neuron-bg-content animate-pulse"></div>
             </div>
             <div>
-              <h1 class="text-xl font-ui font-bold text-neuron-text-primary">Neural Assistant</h1>
-              <div class="flex items-center space-x-2 text-sm text-neuron-text-secondary">
+              <h1 class="text-xl text-heading text-neuron-text-primary">Neural Assistant</h1>
+              <div class="flex items-center space-x-2 text-sm text-body-sans text-neuron-text-secondary">
                 <div class="w-2 h-2 bg-neuron-glow rounded-full animate-pulse"></div>
                 <span>{{ aiStatus }}</span>
               </div>
@@ -86,7 +86,7 @@
             <div class="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-neuron-glow to-neuron-glow-hover rounded-full flex items-center justify-center shadow-glow-lg animate-synapse-pulse">
               <MessageSquare class="w-12 h-12 text-white" />
             </div>
-            <h2 class="text-2xl font-ui font-bold text-neuron-text-primary mb-4">Welcome to Neural Chat</h2>
+            <h2 class="text-2xl font-heading font-bold text-neuron-text-primary mb-4">Welcome to Neural Chat</h2>
             <p class="text-neuron-text-secondary mb-8 max-w-md mx-auto">
               Ask me anything about news, current events, or explore connections between topics. 
               I'll provide insights backed by our knowledge graph.
@@ -331,7 +331,7 @@
       >
         <div class="p-4 border-b border-neuron-border">
           <div class="flex items-center justify-between">
-            <h3 class="font-ui font-medium text-neuron-text-primary">Knowledge Graph</h3>
+            <h3 class="font-heading font-medium text-neuron-text-primary">Knowledge Graph</h3>
             <button
               @click="showKnowledgeGraph = false"
               class="btn-icon p-1"
@@ -373,7 +373,7 @@
     <div v-if="showSettings" class="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
       <div class="bg-neuron-bg-content border border-neuron-border rounded-2xl w-full max-w-lg p-6">
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-ui font-medium text-neuron-text-primary">Chat Settings</h3>
+          <h3 class="text-lg font-heading font-medium text-neuron-text-primary">Chat Settings</h3>
           <button
             @click="showSettings = false"
             class="btn-icon p-1"

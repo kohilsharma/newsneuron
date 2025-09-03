@@ -22,10 +22,10 @@
       <div class="flex-1 min-w-0">
         <div class="flex items-start justify-between">
           <div class="flex-1">
-            <h3 class="text-lg font-ui font-medium text-neuron-text-primary group-hover:text-neuron-glow transition-colors duration-300 line-clamp-2">
+            <h3 class="text-lg text-heading text-neuron-text-primary group-hover:text-neuron-glow transition-colors duration-300 line-clamp-2">
               {{ flashcard.title }}
             </h3>
-            <p class="text-neuron-text-secondary mt-2 line-clamp-2">
+            <p class="text-body-sans text-neuron-text-secondary mt-2 line-clamp-2">
               {{ flashcard.summary }}
             </p>
             

@@ -41,6 +41,19 @@ export default {
         'text-muted': '#6E7681',          // Dimmer text
         'neuron-glow': '#00A7E1',         // Accent color
         
+        // Logo Colors - Unique Purple Palette
+        'logo-primary': '#8B5CF6',       // Purple
+        'logo-secondary': '#A855F7',     // Lighter purple
+        'logo-glow': '#C084FC',          // Soft purple glow
+        
+        // Accent Colors - More Variety
+        'accent-emerald': '#10B981',     // Green accent
+        'accent-amber': '#F59E0B',       // Yellow accent  
+        'accent-rose': '#F43F5E',        // Pink accent
+        'accent-violet': '#8B5CF6',      // Purple accent
+        'accent-cyan': '#06B6D4',        // Cyan accent
+        'accent-orange': '#EA580C',      // Orange accent
+        
         // Grayscale system optimized for dark mode
         gray: {
           50: '#E6EDF3',   // Primary text
@@ -81,11 +94,13 @@ export default {
         },
       },
       
-      // Typography System - Clarity Scale
+      // Typography System - Ultra-Modern Design
       fontFamily: {
-        'ui': ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
-        'body': ['Manrope', 'Inter', 'system-ui', 'sans-serif'],
-        'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],
+        'display': ['Space Grotesk', 'system-ui', 'sans-serif'],           // Logo & Display text
+        'heading': ['Space Grotesk', 'system-ui', 'sans-serif'],           // Headings (lighter)
+        'body': ['Space Grotesk', 'system-ui', 'sans-serif'],              // Body text  
+        'mono': ['JetBrains Mono', 'Fira Code', 'monospace'],              // Code/Technical
+        'serif': ['Playfair Display', 'Georgia', 'serif'],                 // Elegant accents
       },
       
       fontSize: {

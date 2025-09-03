@@ -71,7 +71,7 @@
     <div class="p-6 h-full flex flex-col">
       
       <!-- Title -->
-      <h3 class="text-lg font-ui font-medium text-neuron-text-primary mb-3 line-clamp-2 group-hover:text-neuron-glow transition-colors duration-200">
+      <h3 class="text-lg font-heading font-medium text-neuron-text-primary mb-3 line-clamp-2 group-hover:text-neuron-glow transition-colors duration-200">
         {{ flashcard.title }}
       </h3>
       
@@ -87,10 +87,11 @@
             <div 
               v-for="(connection, index) in flashcard.connections.slice(0, 3)"
               :key="connection"
-              class="w-6 h-6 rounded-full bg-neuron-glow/20 border-2 border-neuron-bg-content flex items-center justify-center"
+              :class="getConnectionColor(index)"
+              class="w-6 h-6 rounded-full border-2 border-neuron-bg-content flex items-center justify-center"
               :style="{ zIndex: 10 - index }"
             >
-              <div class="w-2 h-2 bg-neuron-glow rounded-full animate-pulse"></div>
+              <div :class="getConnectionDotColor(index)" class="w-2 h-2 rounded-full animate-pulse"></div>
             </div>
           </div>
           <span class="text-xs text-neuron-text-secondary">
@@ -198,13 +199,17 @@ const categoryClasses = computed(() => {
   const category = props.flashcard.category?.toLowerCase()
   switch (category) {
     case 'technology':
-      return 'bg-blue-900/30 text-blue-400 border border-blue-600/30'
+      return 'bg-accent-violet/20 text-accent-violet border border-accent-violet/30'
     case 'business':
-      return 'bg-green-900/30 text-green-400 border border-green-600/30'
+      return 'bg-accent-emerald/20 text-accent-emerald border border-accent-emerald/30'
     case 'politics':
-      return 'bg-purple-900/30 text-purple-400 border border-purple-600/30'
+      return 'bg-accent-rose/20 text-accent-rose border border-accent-rose/30'
     case 'science':
-      return 'bg-orange-900/30 text-orange-400 border border-orange-600/30'
+      return 'bg-accent-amber/20 text-accent-amber border border-accent-amber/30'
+    case 'environment':
+      return 'bg-accent-cyan/20 text-accent-cyan border border-accent-cyan/30'
+    case 'economics':
+      return 'bg-accent-orange/20 text-accent-orange border border-accent-orange/30'
     default:
       return 'bg-neuron-border text-neuron-text-secondary border border-neuron-border'
   }
@@ -262,6 +267,25 @@ const formatRelativeTime = (dateString) => {
 
 const formatFullDate = (dateString) => {
   return new Date(dateString).toLocaleString()
+}
+
+// Connection color variety
+const getConnectionColor = (index) => {
+  const colors = [
+    'bg-accent-emerald/20',
+    'bg-accent-violet/20', 
+    'bg-accent-amber/20'
+  ]
+  return colors[index % colors.length]
+}
+
+const getConnectionDotColor = (index) => {
+  const colors = [
+    'bg-accent-emerald',
+    'bg-accent-violet',
+    'bg-accent-amber'
+  ]
+  return colors[index % colors.length]
 }
 
 // Close options when clicking outside

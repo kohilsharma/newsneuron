@@ -4,8 +4,8 @@
     @click="handleClick"
   >
     <div class="flex-1">
-      <h4 class="font-medium text-gray-900 text-sm">{{ topic.topic }}</h4>
-      <p class="text-xs text-gray-500 mt-1">
+      <h4 class="text-heading text-neuron-text-primary text-sm">{{ topic.topic }}</h4>
+      <p class="text-xs text-neuron-text-secondary mt-1 font-body">
         {{ topic.mention_count }} mentions
       </p>
     </div>
